@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using RestSharp;
 using Russel_CLI.Extensions;
+using System.Diagnostics.Metrics;
 using System.Text;
 
 namespace Russel_CLI.Helpers;
@@ -14,6 +15,23 @@ public class ApiClient
     {
         _baseUrl = baseUrl;
         _client = new RestClient(baseUrl);
+    }
+
+    public async Task CheckConnection()
+    {
+        var url = $"/api/check";
+        var request = new RestRequest(url, Method.Get);
+
+        var response = await _client.ExecuteAsync(request);
+
+        if (response.IsSuccessful)
+        {
+            "tock".WriteResponse();
+        }
+        else
+        {
+            response.ErrorMessage.WriteError();
+        }
     }
 
     public async Task Set(string cluster, string key, string value)
@@ -34,11 +52,11 @@ public class ApiClient
 
         if (response.IsSuccessful)
         {
-            Console.WriteLine($"Value [{value}] set on cluster [{cluster}]");
+            $"Value [{value}] set on cluster [{cluster}]".WriteResponse();
         }
         else
         {
-            Console.WriteLine($"Error setting value: {response.ErrorMessage}");
+            $"Error setting value: {response.ErrorMessage}".WriteError();
         }
     }
 
@@ -60,7 +78,7 @@ public class ApiClient
                 }
                 else
                 {
-                    throw new Exception("Failed to get value");
+                    "Failed to get value".WriteError();
                 }
             }
             return response.ErrorMessage;
@@ -80,11 +98,11 @@ public class ApiClient
 
         if (response.IsSuccessful)
         {
-            Console.WriteLine($"Deleted {key} from cluster [{cluster}]");
+            $"Deleted {key} from cluster [{cluster}]".WriteResponse();
         }
         else
         {
-            throw new Exception($"Error deleting value: {response.ErrorMessage}");
+            $"Error deleting value: {response.ErrorMessage}".WriteError();
         }
     }
 
@@ -115,11 +133,11 @@ public class ApiClient
 
         if (response.IsSuccessful)
         {
-            Console.WriteLine($"cluster [{cluster}] set");
+            $"cluster [{cluster}] set".WriteResponse();
         }
         else
         {
-            Console.WriteLine($"Error set cluster: {response.ErrorMessage}");
+            $"Error set cluster: {response.ErrorMessage}".WriteError();
         }
     }
     public async Task ClearCluster(string cluster)
@@ -131,28 +149,11 @@ public class ApiClient
 
         if (response.IsSuccessful)
         {
-            Console.WriteLine($"Cleared cluster [{cluster}]");
+            $"Cleared cluster [{cluster}]".WriteResponse();
         }
         else
         {
-            throw new Exception($"Error clearing cluster: {response.ErrorMessage}");
-        }
-    }
-
-    public async Task ClearAll()
-    {
-        var url = $"/api/clear_all";
-        var request = new RestRequest(url, Method.Delete);
-
-        var response = await _client.ExecuteAsync(request);
-
-        if (response.IsSuccessful)
-        {
-            Console.WriteLine("Cleared all clusters");
-        }
-        else
-        {
-            throw new Exception($"Error clearing all clusters: {response.ErrorMessage}");
+            $"Error clearing cluster: {response.ErrorMessage}".WriteError();
         }
     }
 
@@ -189,24 +190,6 @@ public class ApiClient
         }
     }
 
-
-    public async Task<ushort> GetPort()
-    {
-        var url = $"/api/port";
-        var request = new RestRequest(url, Method.Get);
-
-        var response = await _client.ExecuteAsync(request);
-
-        if (response.IsSuccessful)
-        {
-            var apiResponse = JsonConvert.DeserializeObject<ApiResponse<ushort>>(response.Content);
-            return apiResponse.Data;
-        }
-        else
-        {
-            throw new Exception($"Error getting port: {response.ErrorMessage}");
-        }
-    }
 }
 //requests
 public class ApiResponse<T>
