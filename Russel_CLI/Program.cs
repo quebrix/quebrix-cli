@@ -14,7 +14,8 @@ public class Program
             var configJson = await File.ReadAllTextAsync("CLI_Config.json");
             var config = JsonSerializer.Deserialize<Config>(configJson);
             var port = config.ApiSettings.Port;
-            var client = new ApiClient($"http://127.0.0.1:{port}");
+            var ip = config.ApiSettings.Ip;
+            var client = new ApiClient($"http://{ip}:{port}");
             await CommandHandler.HandleCommand(client);
         }
         catch (Exception ex)
