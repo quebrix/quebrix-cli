@@ -10,6 +10,7 @@ namespace Russel_CLI.Settings
     public class ApiSettings
     {
         public string Port { get; set; }
+        public string Ip { get; set; }
     }
     public class Config
     {
