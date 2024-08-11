@@ -9,7 +9,7 @@ public static class CommandHandler
             PrintPrompt();
 
             var input = Console.ReadLine().Trim();
-            var parts = input.Split(new[] { ' ' }, 4);
+            var parts = input.Split(new[] { ' ' }, 5);
             if (parts.Length == 0)
             {
                 continue;
@@ -17,17 +17,29 @@ public static class CommandHandler
 
             switch (parts[0])
             {
-                case "tick":
+                case "ping":
                     {
                         await client.CheckConnection();
                         break;
                     }
-                case "set" when parts.Length == 4:
+                case "set" when parts.Length == 5 || parts.Length == 4:
                     {
-                        var cluster = parts[1];
-                        var key = parts[2];
-                        var value = parts[3];
-                        await client.Set(cluster, key, value);
+                        if(parts.Length == 4)
+                        {
+                            var cluster = parts[1];
+                            var key = parts[2];
+                            var value = parts[3];
+                            await client.Set(cluster, key, value);
+                        }
+                        else
+                        {
+                            var cluster = parts[1];
+                            var key = parts[2];
+                            var value = parts[3];
+                            var expireTime = Convert.ToInt64(parts[4]);
+                            await client.Set(cluster, key, value,expireTime);
+                        }
+                       
                         break;
                     }
                 case "set_cluster" when parts.Length == 2:
@@ -94,6 +106,7 @@ public static class CommandHandler
     {
         "Commands:".WriteInfo();
         "set [cluster name] [key] [value] - Set value for key in cluster".WriteInfo();
+        "set [cluster name] [key] [value] [ttl in millisecond] - Set value for key with time life in cluster".WriteInfo();
         "set_cluster [cluster name] - Set a new cluster".WriteInfo();
         "get [cluster name] [key] - Get value for key in cluster".WriteInfo();
         "delete [cluster name] [key] - Delete key from cluster".WriteInfo();

@@ -34,7 +34,7 @@ public class ApiClient
         }
     }
 
-    public async Task Set(string cluster, string key, string value)
+    public async Task Set(string cluster, string key, string value, long? expireTime = null)
     {
         var url = "/api/set";
         var request = new RestRequest(url, Method.Post);
@@ -43,7 +43,8 @@ public class ApiClient
         {
             cluster = cluster,
             key = key,
-            value = Convert.ToBase64String(Encoding.UTF8.GetBytes(value))
+            value = Convert.ToBase64String(Encoding.UTF8.GetBytes(value)),
+            ttl = expireTime
         };
         var jsonBody = JsonConvert.SerializeObject(setRequest);
         request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
@@ -52,7 +53,7 @@ public class ApiClient
 
         if (response.IsSuccessful)
         {
-            $"Value [{value}] set on cluster [{cluster}]".WriteResponse();
+            $"Value set on cluster [{cluster}]".WriteResponse();
         }
         else
         {
@@ -211,5 +212,8 @@ public class SetRequest
 
     [JsonProperty("value")]
     public string value { get; set; }
+
+    [JsonProperty("ttl")]
+    public long? ttl { get; set; }
 }
 

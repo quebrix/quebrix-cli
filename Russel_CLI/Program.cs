@@ -39,9 +39,9 @@ public class Program
         Console.WriteLine("                      ||  //     //   //     //   /     //    /     //     //           //        ||");
         Console.WriteLine("                      ||  //     //   ////////   /////////   /////////     /////////    ///////// ||");
         Console.WriteLine("                      |============================================================================|");
-        Console.WriteLine("" +
+        Console.WriteLine("                        VERSION 0.1.0" +
             "");
-        Console.WriteLine("======================================= FOR CHECKING CONNECTION TYPE [tick] ============================================");
+        Console.WriteLine("======================================= FOR CHECKING CONNECTION TYPE [ping] ============================================");
 
         Console.ResetColor();
     }
