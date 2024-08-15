@@ -19,14 +19,14 @@ public class ApiClient
 
     public async Task CheckConnection()
     {
-        var url = $"/api/check";
+        var url = $"/api/ping";
         var request = new RestRequest(url, Method.Get);
 
         var response = await _client.ExecuteAsync(request);
 
         if (response.IsSuccessful)
         {
-            "tock".WriteResponse();
+            "pong".WriteResponse();
         }
         else
         {
