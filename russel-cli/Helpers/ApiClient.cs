@@ -30,7 +30,7 @@ public class ApiClient
         }
         else
         {
-            response.ErrorMessage.WriteError();
+            "russel is not run check russel first.".WriteError();
         }
     }
 
