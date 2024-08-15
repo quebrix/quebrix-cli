@@ -68,14 +68,12 @@ public static class CommandHandler
                         var cluster = parts[1];
                         var key = parts[2];
                         await client.Delete(cluster, key);
-                        $"Deleted {key} from cluster [{cluster}]".WriteResponse();
                         break;
                     }
                 case "clear_cluster" when parts.Length == 2:
                     {
                         var cluster = parts[1];
                         await client.ClearCluster(cluster);
-                        $"Cleared cluster [{cluster}]".WriteResponse();
                         break;
                     }
                 case "cluster*":
@@ -112,6 +110,7 @@ public static class CommandHandler
         "delete [cluster name] [key] - Delete key from cluster".WriteInfo();
         "clear_cluster [cluster name] - Clear all keys in cluster".WriteInfo();
         "cluster* - Get list of all clusters".WriteInfo();
+        "keys* [cluster name] - Get all keys in cluster".WriteInfo();
         "-v - Show version".WriteInfo();
         "help - Show this help message".WriteInfo();
     }
