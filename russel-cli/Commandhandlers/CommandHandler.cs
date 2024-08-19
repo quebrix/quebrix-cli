@@ -24,7 +24,7 @@ public static class CommandHandler
                     }
                 case "set" when parts.Length == 5 || parts.Length == 4:
                     {
-                        if(parts.Length == 4)
+                        if (parts.Length == 4)
                         {
                             var cluster = parts[1];
                             var key = parts[2];
@@ -37,15 +37,15 @@ public static class CommandHandler
                             var key = parts[2];
                             var value = parts[3];
                             var expireTime = Convert.ToInt64(parts[4]);
-                            await client.Set(cluster, key, value,expireTime);
+                            await client.Set(cluster, key, value, expireTime);
                         }
-                       
+
                         break;
                     }
                 case "set_cluster" when parts.Length == 2:
                     {
                         var cluster = parts[1];
-                        await client.SetCluster(cluster); 
+                        await client.SetCluster(cluster);
                         break;
                     }
                 case "keys*" when parts.Length == 2:
@@ -60,7 +60,10 @@ public static class CommandHandler
                         var cluster = parts[1];
                         var key = parts[2];
                         var value = await client.Get(cluster, key);
-                        $"{value}".WriteResponse();
+                        if (value == null)
+                            $"key not found".WriteError();
+                        else
+                            $"{value}".WriteResponse();
                         break;
                     }
                 case "delete" when parts.Length == 3:

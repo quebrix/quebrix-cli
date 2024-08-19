@@ -50,10 +50,17 @@ public class ApiClient
         request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
 
         var response = await _client.ExecuteAsync(request);
-
         if (response.IsSuccessful)
         {
-            $"Value set on cluster [{cluster}]".WriteResponse();
+            var result = JsonConvert.DeserializeObject<ApiResponse<string>>(response.Content);
+            if (result.IsSuccess)
+            {
+                $"Value set on cluster [{cluster}]".WriteResponse();
+            }
+            else
+            {
+                "access denied login first".WriteError();
+            }
         }
         else
         {
@@ -75,7 +82,7 @@ public class ApiClient
                 var apiResponse = JsonConvert.DeserializeObject<ApiResponse<byte[]>>(response.Content);
                 if (apiResponse.IsSuccess)
                 {
-                    return Encoding.UTF8.GetString(apiResponse.Data).DecodeBase64ToString();
+                    var result = Encoding.UTF8.GetString(apiResponse.Data).DecodeBase64ToString();
                 }
                 else
                 {
