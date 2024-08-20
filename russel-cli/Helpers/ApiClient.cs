@@ -34,11 +34,14 @@ public class ApiClient
         }
     }
 
-    public async Task Set(string cluster, string key, string value, long? expireTime = null)
+
+
+    public async Task Set(string cluster, string key, string value, string userName, string password, long? expireTime = null)
     {
         var url = "/api/set";
         var request = new RestRequest(url, Method.Post);
-
+        request.AddHeader("X-Username", userName);
+        request.AddHeader("X-Password", password);
         var setRequest = new SetRequest
         {
             cluster = cluster,
@@ -66,6 +69,65 @@ public class ApiClient
         {
             $"Error setting value: {response.ErrorMessage}".WriteError();
         }
+    }
+
+    public async Task AddUser(string userName, string password)
+    {
+        var url = "/api/add_profile";
+        var request = new RestRequest(url, Method.Post);
+        var setRequest = new AuthenticateRequest
+        {
+            password = password,
+            UserName = userName,
+        };
+        request.AddBody(JsonConvert.SerializeObject(setRequest));
+        var response = await _client.ExecuteAsync(request);
+        if (response.IsSuccessful)
+        {
+            var result = JsonConvert.DeserializeObject<ApiResponse<string>>(response.Content);
+            if (result.IsSuccess)
+                $"{result.Data}".WriteGreen();
+            else
+                $"{result.Data}".WriteError();
+
+        }
+        else
+            "error to set profile".WriteError();
+    }
+
+    public async Task<bool> Authenticate(string userName, string password)
+    {
+        var url = "/api/login";
+        var request = new RestRequest(url, Method.Post);
+        var setRequest = new AuthenticateRequest
+        {
+            password = password,
+            UserName = userName,
+        };
+        request.AddBody(JsonConvert.SerializeObject(setRequest));
+        var response = await _client.ExecuteAsync(request);
+        if (response.IsSuccessful)
+        {
+            var result = JsonConvert.DeserializeObject<ApiResponse<string>>(response.Content);
+            if (result.IsSuccess)
+            {
+                $" => {result.Data}".WriteGreen();
+                return true;
+            }
+
+            else
+            {
+                $" => {result.Data}".WriteError();
+                return false;
+            }
+
+        }
+        else
+        {
+            " => error to set profile".WriteError();
+            return false;
+        }
+            
     }
 
     public async Task<string> Get(string cluster, string key)
@@ -222,5 +284,14 @@ public class SetRequest
 
     [JsonProperty("ttl")]
     public long? ttl { get; set; }
+}
+
+public class AuthenticateRequest
+{
+    [JsonProperty("username")]
+    public string UserName { get; set; }
+
+    [JsonProperty("password")]
+    public string password { get; set; }
 }
 
