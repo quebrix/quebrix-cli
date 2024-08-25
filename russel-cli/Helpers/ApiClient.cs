@@ -35,13 +35,13 @@ public class ApiClient
     }
 
 
+    private string MakeAuth(string username, string password) => Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
+
 
     public async Task Set(string cluster, string key, string value, string userName, string password, long? expireTime = null)
     {
         var url = "/api/set";
         var request = new RestRequest(url, Method.Post);
-        request.AddHeader("X-Username", userName);
-        request.AddHeader("X-Password", password);
         var setRequest = new SetRequest
         {
             cluster = cluster,
@@ -51,6 +51,10 @@ public class ApiClient
         };
         var jsonBody = JsonConvert.SerializeObject(setRequest);
         request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+        request.AddHeader("X-Username", userName);
+        request.AddHeader("X-Password", password);
+        var credentials = MakeAuth(userName,password);
+        request.AddHeader("Authorization", $"{credentials}");
 
         var response = await _client.ExecuteAsync(request);
         if (response.IsSuccessful)
@@ -71,16 +75,21 @@ public class ApiClient
         }
     }
 
-    public async Task AddUser(string userName, string password)
+    public async Task AddUser(string userName, string password,string role,string reqUser,string reqPassword)
     {
-        var url = "/api/add_profile";
+        var url = "/api/add_user";
+        if (role != "Admin" && role != "Developer")
+            "wrong role set Admin or Developer".WriteError();
         var request = new RestRequest(url, Method.Post);
         var setRequest = new AuthenticateRequest
         {
             password = password,
             UserName = userName,
+            Role = role
         };
         request.AddBody(JsonConvert.SerializeObject(setRequest));
+        var credentials = MakeAuth(reqUser, reqPassword);
+        request.AddHeader("Authorization", $"{credentials}");
         var response = await _client.ExecuteAsync(request);
         if (response.IsSuccessful)
         {
@@ -103,28 +112,28 @@ public class ApiClient
         {
             password = password,
             UserName = userName,
+            Role = string.Empty
         };
-        request.AddBody(JsonConvert.SerializeObject(setRequest));
+        request.AddHeader("Content-Type", "application/json");
+        request.AddJsonBody(JsonConvert.SerializeObject(setRequest));
         var response = await _client.ExecuteAsync(request);
         if (response.IsSuccessful)
         {
             var result = JsonConvert.DeserializeObject<ApiResponse<string>>(response.Content);
             if (result.IsSuccess)
             {
-                $" => {result.Data}".WriteGreen();
                 return true;
             }
 
             else
             {
-                $" => {result.Data}".WriteError();
                 return false;
             }
 
         }
         else
         {
-            " => error to set profile".WriteError();
+            "".WriteError();
             return false;
         }
             
@@ -293,5 +302,7 @@ public class AuthenticateRequest
 
     [JsonProperty("password")]
     public string password { get; set; }
+    [JsonProperty("role")]
+    public string Role { get;  set; }
 }
 

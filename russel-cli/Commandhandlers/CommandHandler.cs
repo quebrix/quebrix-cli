@@ -30,44 +30,58 @@ public static class CommandHandler
     }
     public static async Task HandleCommand(ApiClient client)
     {
+        string mainUserName = string.Empty;
+        string mainPassword = string.Empty;
+        bool isLoggedIn = false;
+
         while (true)
         {
-            PrintPrompt();
+            if (!isLoggedIn)
+            {
+                "user_name:".WriteResponseInLine();
+                var userName = Console.ReadLine();
+                "password:".WriteResponseInLine();
+                var password = ReadPassword();
 
+                if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
+                {
+                    "You must provide a user_name and password.".WriteError();
+                    continue; 
+                }
+
+                var result = await client.Authenticate(userName, password);
+                if (result)
+                {
+                    mainUserName = userName;
+                    mainPassword = password;
+                    isLoggedIn = true;
+                    "".WriteResponse();
+                    "Logged in successfully.".WriteGreen();
+                }
+                else
+                {
+                    "Authentication failed.".WriteError();
+                    continue; 
+                }
+            }
+
+            // Process commands once logged in
+            PrintPrompt();
             var input = Console.ReadLine().Trim();
             var parts = input.Split(new[] { ' ' }, 5);
             if (parts.Length == 0)
             {
                 continue;
             }
-            string mainUserName = string.Empty;
-            string mainPassword = string.Empty;
+
             switch (parts[0])
             {
-                case "login":
-                    {
-                        "user_name:".WriteResponseInLine();
-                        var userName = Console.ReadLine();
-                        "password:".WriteResponseInLine();
-                        var password = ReadPassword();
-                        if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
-                            "you must put user_name and password".WriteError();
-                        else
-                        {
-                            var result = await client.Authenticate(userName, password);
-                            if (result)
-                            {
-                                mainUserName = userName;
-                                mainPassword = password;
-                            }
-                        }
-                        break;
-                    }
-                case "add_profile" when parts.Length == 3:
+                case "add_profile" when parts.Length == 4:
                     {
                         var user = parts[1];
                         var password = parts[2];
-                        await client.AddUser(user, password);
+                        var role = parts[3];
+                        await client.AddUser(user, password,role,mainUserName,mainPassword);
                         break;
                     }
                 case "ping":
@@ -77,22 +91,19 @@ public static class CommandHandler
                     }
                 case "set" when parts.Length == 5 || parts.Length == 4:
                     {
+                        var cluster = parts[1];
+                        var key = parts[2];
+                        var value = parts[3];
+
                         if (parts.Length == 4)
                         {
-                            var cluster = parts[1];
-                            var key = parts[2];
-                            var value = parts[3];
                             await client.Set(cluster, key, value, mainUserName, mainPassword);
                         }
                         else
                         {
-                            var cluster = parts[1];
-                            var key = parts[2];
-                            var value = parts[3];
                             var expireTime = Convert.ToInt64(parts[4]);
                             await client.Set(cluster, key, value, mainUserName, mainPassword, expireTime);
                         }
-
                         break;
                     }
                 case "set_cluster" when parts.Length == 2:
@@ -114,7 +125,7 @@ public static class CommandHandler
                         var key = parts[2];
                         var value = await client.Get(cluster, key);
                         if (value == null)
-                            $"key not found".WriteError();
+                            $"Key not found.".WriteError();
                         else
                             $"{value}".WriteResponse();
                         break;
@@ -143,6 +154,14 @@ public static class CommandHandler
                         PrintHelp();
                         break;
                     }
+                case "logout":
+                    {
+                        isLoggedIn = false;
+                        mainUserName = string.Empty;
+                        mainPassword = string.Empty;
+                        "Logged out successfully.".WriteResponse();
+                        break;
+                    }
                 default:
                     {
                         "Invalid command. Use 'help' to see available commands.".WriteInfo();
@@ -150,6 +169,7 @@ public static class CommandHandler
                     }
             }
         }
+
     }
 
     private static void PrintPrompt()
