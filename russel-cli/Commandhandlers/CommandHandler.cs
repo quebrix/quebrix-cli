@@ -109,13 +109,13 @@ public static class CommandHandler
                 case "set_cluster" when parts.Length == 2:
                     {
                         var cluster = parts[1];
-                        await client.SetCluster(cluster);
+                        await client.SetCluster(cluster,mainUserName,mainPassword);
                         break;
                     }
                 case "keys*" when parts.Length == 2:
                     {
                         var cluster = parts[1];
-                        var keys = await client.GetKeysOfCluster(cluster);
+                        var keys = await client.GetKeysOfCluster(cluster, mainUserName, mainPassword);
                         $"Keys in cluster [{cluster}]: {string.Join(", ", keys)}".WriteResponse();
                         break;
                     }
@@ -123,7 +123,7 @@ public static class CommandHandler
                     {
                         var cluster = parts[1];
                         var key = parts[2];
-                        var value = await client.Get(cluster, key);
+                        var value = await client.Get(cluster, key, mainUserName, mainPassword);
                         if (value == null)
                             $"Key not found.".WriteError();
                         else
@@ -134,18 +134,18 @@ public static class CommandHandler
                     {
                         var cluster = parts[1];
                         var key = parts[2];
-                        await client.Delete(cluster, key);
+                        await client.Delete(cluster, key, mainUserName, mainPassword);
                         break;
                     }
                 case "clear_cluster" when parts.Length == 2:
                     {
                         var cluster = parts[1];
-                        await client.ClearCluster(cluster);
+                        await client.ClearCluster(cluster, mainUserName, mainPassword);
                         break;
                     }
                 case "cluster*":
                     {
-                        var clusters = await client.GetAllClusters();
+                        var clusters = await client.GetAllClusters(mainUserName, mainPassword);
                         $"Clusters are: {string.Join(", ", clusters)}".WriteResponse();
                         break;
                     }
