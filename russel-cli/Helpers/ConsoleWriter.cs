@@ -14,6 +14,13 @@ namespace Russel_CLI.Helpers
             Console.WriteLine(text);
             Console.ResetColor();
         }
+
+        public static void WriteGreenInLine(this string text)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write(text);
+            Console.ResetColor();
+        }
         public static void WriteError(this string text)
         {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -27,11 +34,24 @@ namespace Russel_CLI.Helpers
             Console.WriteLine(text);
             Console.ResetColor();
         }
+        public static void WriteResponseInLine(this string text)
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write(text);
+            Console.ResetColor();
+        }
 
         public static void WriteInfo(this string text)
         {
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine(text);
+            Console.ResetColor();
+        }
+
+        public static void WriteInfoInLine(this string text)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.Write(text);
             Console.ResetColor();
         }
     }
