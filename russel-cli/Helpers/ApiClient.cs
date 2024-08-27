@@ -51,9 +51,7 @@ public class ApiClient
         };
         var jsonBody = JsonConvert.SerializeObject(setRequest);
         request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
-        request.AddHeader("X-Username", userName);
-        request.AddHeader("X-Password", password);
-        var credentials = MakeAuth(userName,password);
+        var credentials = MakeAuth(userName, password);
         request.AddHeader("Authorization", $"{credentials}");
 
         var response = await _client.ExecuteAsync(request);
@@ -75,7 +73,7 @@ public class ApiClient
         }
     }
 
-    public async Task AddUser(string userName, string password,string role,string reqUser,string reqPassword)
+    public async Task AddUser(string userName, string password, string role, string reqUser, string reqPassword)
     {
         var url = "/api/add_user";
         if (role != "Admin" && role != "Developer")
@@ -136,16 +134,17 @@ public class ApiClient
             "".WriteError();
             return false;
         }
-            
+
     }
 
-    public async Task<string> Get(string cluster, string key)
+    public async Task<string> Get(string cluster, string key, string userName, string password)
     {
         try
         {
             var url = $"/api/get/{cluster}/{key}";
             var request = new RestRequest(url, Method.Get);
-
+            var credentials = MakeAuth(userName, password);
+            request.AddHeader("Authorization", $"{credentials}");
             var response = await _client.ExecuteAsync(request);
 
             if (response.IsSuccessful)
@@ -154,6 +153,7 @@ public class ApiClient
                 if (apiResponse.IsSuccess)
                 {
                     var result = Encoding.UTF8.GetString(apiResponse.Data).DecodeBase64ToString();
+                    return result;
                 }
                 else
                 {
@@ -168,11 +168,12 @@ public class ApiClient
         }
     }
 
-    public async Task Delete(string cluster, string key)
+    public async Task Delete(string cluster, string key, string userName, string password)
     {
         var url = $"/api/delete/{cluster}/{key}";
         var request = new RestRequest(url, Method.Delete);
-
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
         var response = await _client.ExecuteAsync(request);
 
         if (response.IsSuccessful)
@@ -185,11 +186,12 @@ public class ApiClient
         }
     }
 
-    public async Task<List<string>> GetKeysOfCluster(string clusterName)
+    public async Task<List<string>> GetKeysOfCluster(string clusterName, string userName, string password)
     {
         var url = $"/api/get_keys/{clusterName}";
         var request = new RestRequest(url, Method.Get);
-
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
         var response = await _client.ExecuteAsync(request);
 
         if (response.IsSuccessful)
@@ -203,11 +205,12 @@ public class ApiClient
         }
     }
 
-    public async Task SetCluster(string cluster)
+    public async Task SetCluster(string cluster, string userName, string password)
     {
         var url = $"/api/set_cluster/{cluster}";
         var request = new RestRequest(url, Method.Post);
-
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
         var response = await _client.ExecuteAsync(request);
 
         if (response.IsSuccessful)
@@ -219,11 +222,12 @@ public class ApiClient
             $"Error set cluster: {response.ErrorMessage}".WriteError();
         }
     }
-    public async Task ClearCluster(string cluster)
+    public async Task ClearCluster(string cluster, string userName, string password)
     {
         var url = $"/api/clear_cluster/{cluster}";
         var request = new RestRequest(url, Method.Delete);
-
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
         var response = await _client.ExecuteAsync(request);
 
         if (response.IsSuccessful)
@@ -236,11 +240,12 @@ public class ApiClient
         }
     }
 
-    public async Task<List<string>> GetAllClusters()
+    public async Task<List<string>> GetAllClusters(string userName, string password)
     {
         var url = $"/api/get_clusters";
         var request = new RestRequest(url, Method.Get);
-
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
         var response = await _client.ExecuteAsync(request);
 
         if (response.IsSuccessful)
@@ -303,6 +308,6 @@ public class AuthenticateRequest
     [JsonProperty("password")]
     public string password { get; set; }
     [JsonProperty("role")]
-    public string Role { get;  set; }
+    public string Role { get; set; }
 }
 
