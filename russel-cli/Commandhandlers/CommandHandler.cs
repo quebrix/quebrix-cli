@@ -159,7 +159,7 @@ public static class CommandHandler
                         isLoggedIn = false;
                         mainUserName = string.Empty;
                         mainPassword = string.Empty;
-                        "Logged out successfully.".WriteResponse();
+                        "Logged out successfully.".WriteGreen();
                         break;
                     }
                 default:
@@ -180,7 +180,7 @@ public static class CommandHandler
     {
         "Commands:".WriteInfo();
         "add_profile [userName] [password] to set new profile".WriteInfo();
-        "login for login in russel".WriteInfo();
+        "logout for logout in russel".WriteInfo();
         "set [cluster name] [key] [value] - Set value for key in cluster".WriteInfo();
         "set [cluster name] [key] [value] [ttl in millisecond] - Set value for key with time life in cluster".WriteInfo();
         "set_cluster [cluster name] - Set a new cluster".WriteInfo();
