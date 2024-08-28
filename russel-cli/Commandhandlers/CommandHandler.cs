@@ -46,7 +46,7 @@ public static class CommandHandler
                 if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
                 {
                     "You must provide a user_name and password.".WriteError();
-                    continue; 
+                    continue;
                 }
 
                 var result = await client.Authenticate(userName, password);
@@ -61,7 +61,7 @@ public static class CommandHandler
                 else
                 {
                     "Authentication failed.".WriteError();
-                    continue; 
+                    continue;
                 }
             }
 
@@ -81,7 +81,7 @@ public static class CommandHandler
                         var user = parts[1];
                         var password = parts[2];
                         var role = parts[3];
-                        await client.AddUser(user, password,role,mainUserName,mainPassword);
+                        await client.AddUser(user, password, role, mainUserName, mainPassword);
                         break;
                     }
                 case "ping":
@@ -89,19 +89,27 @@ public static class CommandHandler
                         await client.CheckConnection();
                         break;
                     }
-                case "set" when parts.Length == 5 || parts.Length == 4:
+                case "set" when parts.Length == 3:
                     {
                         var cluster = parts[1];
                         var key = parts[2];
-                        var value = parts[3];
+                        "value:".WriteResponse();
+                        var value = Console.ReadLine();
+                        if (string.IsNullOrEmpty(value))
+                        {
+                            "error value can not be bull".WriteError();
+                            break;
+                        }
+                        "ttl:".WriteResponse();
+                        var ttl = Console.ReadLine();
 
-                        if (parts.Length == 4)
+                        if (string.IsNullOrEmpty(ttl))
                         {
                             await client.Set(cluster, key, value, mainUserName, mainPassword);
                         }
                         else
                         {
-                            var expireTime = Convert.ToInt64(parts[4]);
+                            var expireTime = Convert.ToInt64(ttl);
                             await client.Set(cluster, key, value, mainUserName, mainPassword, expireTime);
                         }
                         break;
@@ -109,7 +117,7 @@ public static class CommandHandler
                 case "set_cluster" when parts.Length == 2:
                     {
                         var cluster = parts[1];
-                        await client.SetCluster(cluster,mainUserName,mainPassword);
+                        await client.SetCluster(cluster, mainUserName, mainPassword);
                         break;
                     }
                 case "keys*" when parts.Length == 2:
