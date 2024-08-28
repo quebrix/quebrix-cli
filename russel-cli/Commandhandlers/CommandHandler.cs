@@ -189,7 +189,8 @@ public static class CommandHandler
         "Commands:".WriteInfo();
         "add_profile [userName] [password] to set new profile".WriteInfo();
         "logout for logout in russel".WriteInfo();
-        "set [cluster name] [key] [value] - Set value for key in cluster".WriteInfo();
+        "set [cluster name] [key] - Set value for key in cluster".WriteInfo();
+        "TIP => ttl can be null in set but value can not be null or empty".WriteTip();
         "set [cluster name] [key] [value] [ttl in millisecond] - Set value for key with time life in cluster".WriteInfo();
         "set_cluster [cluster name] - Set a new cluster".WriteInfo();
         "get [cluster name] [key] - Get value for key in cluster".WriteInfo();
