@@ -48,6 +48,20 @@ namespace Russel_CLI.Helpers
             Console.ResetColor();
         }
 
+        public static void WriteTip(this string text)
+        {
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine(text);
+            Console.ResetColor();
+        }
+
+        public static void WriteTipInLine(this string text)
+        {
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.Write(text);
+            Console.ResetColor();
+        }
+
         public static void WriteInfoInLine(this string text)
         {
             Console.ForegroundColor = ConsoleColor.DarkYellow;

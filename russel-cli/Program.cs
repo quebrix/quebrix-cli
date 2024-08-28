@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Russel_CLI.Settings;
 using System.Text.Json;
 using RestSharp;
+using System.Reflection;
 
 public class Program
 {
@@ -40,7 +41,7 @@ public class Program
         Console.WriteLine("                      ||  //     //   //     //   /     //    /     //     //           //        ||");
         Console.WriteLine("                      ||  //     //   ////////   /////////   /////////     /////////    ///////// ||");
         Console.WriteLine("                      |============================================================================|");
-        Console.WriteLine("                        VERSION 0.1.0" +
+        Console.WriteLine($"                        VERSION {Assembly.GetExecutingAssembly().GetName().Version}" +
             "");
         Console.WriteLine("======================================= FOR CHECKING CONNECTION TYPE [ping] ============================================");
 
