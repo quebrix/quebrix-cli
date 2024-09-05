@@ -1,5 +1,6 @@
 ﻿using Russel_CLI.Helpers;
 using System.Diagnostics;
+using System.Reflection;
 
 public static class CommandHandler
 {
@@ -155,6 +156,11 @@ public static class CommandHandler
                     {
                         var clusters = await client.GetAllClusters(mainUserName, mainPassword);
                         $"Clusters are: {string.Join(", ", clusters)}".WriteResponse();
+                        break;
+                    }
+                case "-v":
+                    {
+                        $"Quebrix cli VERSION: {Assembly.GetExecutingAssembly().GetName().Version}".WriteResponse();
                         break;
                     }
                 case "help":

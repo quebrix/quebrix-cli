@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
+using quebrix.Helpers;
 using RestSharp;
 using Russel_CLI.Extensions;
 using System.Diagnostics.Metrics;
 using System.Text;
+using System.Web;
 
 namespace Russel_CLI.Helpers;
 
@@ -131,7 +133,7 @@ public class ApiClient
         }
         else
         {
-            "".WriteError();
+            " ERROR => check server connection".WriteError();
             return false;
         }
 
@@ -141,7 +143,7 @@ public class ApiClient
     {
         try
         {
-            var url = $"/api/get/{cluster}/{key}";
+            var url = $"/api/get/{cluster.EncodeUrl()}/{key.EncodeUrl()}";
             var request = new RestRequest(url, Method.Get);
             var credentials = MakeAuth(userName, password);
             request.AddHeader("Authorization", $"{credentials}");
@@ -170,7 +172,7 @@ public class ApiClient
 
     public async Task Delete(string cluster, string key, string userName, string password)
     {
-        var url = $"/api/delete/{cluster}/{key}";
+        var url = $"/api/delete/{cluster.EncodeUrl()}/{key.EncodeUrl()}";
         var request = new RestRequest(url, Method.Delete);
         var credentials = MakeAuth(userName, password);
         request.AddHeader("Authorization", $"{credentials}");
@@ -188,7 +190,7 @@ public class ApiClient
 
     public async Task<List<string>> GetKeysOfCluster(string clusterName, string userName, string password)
     {
-        var url = $"/api/get_keys/{clusterName}";
+        var url = $"/api/get_keys/{clusterName.EncodeUrl()}";
         var request = new RestRequest(url, Method.Get);
         var credentials = MakeAuth(userName, password);
         request.AddHeader("Authorization", $"{credentials}");
@@ -207,7 +209,7 @@ public class ApiClient
 
     public async Task SetCluster(string cluster, string userName, string password)
     {
-        var url = $"/api/set_cluster/{cluster}";
+        var url = $"/api/set_cluster/{cluster.EncodeUrl()}";
         var request = new RestRequest(url, Method.Post);
         var credentials = MakeAuth(userName, password);
         request.AddHeader("Authorization", $"{credentials}");
@@ -224,7 +226,7 @@ public class ApiClient
     }
     public async Task ClearCluster(string cluster, string userName, string password)
     {
-        var url = $"/api/clear_cluster/{cluster}";
+        var url = $"/api/clear_cluster/{cluster.EncodeUrl()}";
         var request = new RestRequest(url, Method.Delete);
         var credentials = MakeAuth(userName, password);
         request.AddHeader("Authorization", $"{credentials}");

@@ -45,8 +45,6 @@ public class Program
         Console.WriteLine("");
         Console.WriteLine($"                  VERSION {Assembly.GetExecutingAssembly().GetName().Version}" +
             "");
-        Console.WriteLine("======================================= FOR CHECKING CONNECTION TYPE [ping] ============================================");
-
         Console.ResetColor();
     }
 }
