@@ -151,10 +151,14 @@ public class ApiClient
 
             if (response.IsSuccessful)
             {
-                var apiResponse = JsonConvert.DeserializeObject<ApiResponse<byte[]>>(response.Content);
+                var apiResponse = JsonConvert.DeserializeObject<ApiResponse<ValueResult>>(response.Content);
                 if (apiResponse.IsSuccess)
                 {
-                    var result = Encoding.UTF8.GetString(apiResponse.Data).DecodeBase64ToString();
+                    var result = string.Empty;
+                    if (apiResponse.Data.ValueType == "Num")
+                        result = BitConverter.ToInt32(apiResponse.Data.Value).ToString();
+                    else
+                        result = Encoding.UTF8.GetString(apiResponse.Data.Value).DecodeBase64ToString();
                     return result;
                 }
                 else
@@ -300,6 +304,14 @@ public class SetRequest
 
     [JsonProperty("ttl")]
     public long? ttl { get; set; }
+}
+
+public class ValueResult
+{
+    [JsonProperty("value")]
+    public byte[] Value { get; set; }
+    [JsonProperty("value_type")]
+    public string ValueType { get; set; }
 }
 
 public class AuthenticateRequest

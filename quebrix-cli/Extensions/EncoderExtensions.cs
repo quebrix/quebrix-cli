@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace Russel_CLI.Extensions;
 
@@ -20,4 +21,5 @@ public static class EncoderExtensions
         return decodedString;
     }
 }
+
 
