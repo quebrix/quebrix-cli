@@ -75,6 +75,74 @@ public class ApiClient
         }
     }
 
+    public async Task INCR(string cluster, string key, int? value, string userName, string password)
+    {
+        var url = "/api/incr";
+        var request = new RestRequest(url, Method.Post);
+        var setRequest = new SetINCR_DECRRequest
+        {
+            cluster = cluster,
+            key = key,
+            value = value,
+        };
+        var jsonBody = JsonConvert.SerializeObject(setRequest);
+        request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
+
+        var response = await _client.ExecuteAsync(request);
+        if (response.IsSuccessful)
+        {
+            var result = JsonConvert.DeserializeObject<ApiResponse<string>>(response.Content);
+            if (result.IsSuccess)
+            {
+                $"INCR set on cluster [{cluster}]".WriteResponse();
+            }
+            else
+            {
+                "access denied login first".WriteError();
+            }
+        }
+        else
+        {
+            $"Error setting value: {response.ErrorMessage}".WriteError();
+        }
+    }
+
+    public async Task DECR(string cluster, string key, int? value, string userName, string password)
+    {
+        var url = "/api/decr";
+        var request = new RestRequest(url, Method.Post);
+        var setRequest = new SetINCR_DECRRequest
+        {
+            cluster = cluster,
+            key = key,
+            value = value,
+        };
+        var jsonBody = JsonConvert.SerializeObject(setRequest);
+        request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
+
+        var response = await _client.ExecuteAsync(request);
+        if (response.IsSuccessful)
+        {
+            var result = JsonConvert.DeserializeObject<ApiResponse<string>>(response.Content);
+            if (result.IsSuccess)
+            {
+                $"DECR set on cluster [{cluster}]".WriteResponse();
+            }
+            else
+            {
+                "access denied login first".WriteError();
+            }
+        }
+        else
+        {
+            $"Error setting value: {response.ErrorMessage}".WriteError();
+        }
+    }
+
     public async Task AddUser(string userName, string password, string role, string reqUser, string reqPassword)
     {
         var url = "/api/add_user";
@@ -289,6 +357,19 @@ public class ApiResponse<T>
 
     [JsonProperty("data")]
     public T Data { get; set; }
+}
+
+public class SetINCR_DECRRequest
+{
+    [JsonProperty("cluster")]
+    public string cluster { get; set; }
+
+    [JsonProperty("key")]
+    public string key { get; set; }
+
+    [JsonProperty("value")]
+    public int? value { get; set; }
+
 }
 
 public class SetRequest

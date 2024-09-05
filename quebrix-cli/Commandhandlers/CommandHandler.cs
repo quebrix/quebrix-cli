@@ -115,6 +115,55 @@ public static class CommandHandler
                         }
                         break;
                     }
+                case "INCR" when parts.Length == 4 || parts.Length == 3:
+                    {
+                        if (parts.Length == 4)
+                        {
+                            var cluster = parts[1];
+                            var key = parts[2];
+                            var value = parts[3];
+                            if (!string.IsNullOrEmpty(value) && int.TryParse(value, out int result))
+                                await client.INCR(cluster, key, result, mainUserName, mainPassword);
+                            else
+                            {
+                                "invalid enumerator. input must be number".WriteError();
+                                "Tip => INCR [cluster] [key] [number] => INCR dev incr 2".WriteTip();
+                            }
+
+                        }
+                        else
+                        {
+                            var cluster = parts[1];
+                            var key = parts[2];
+                            await client.INCR(cluster, key, null, mainUserName, mainPassword);
+                        }
+
+                        break;
+                    }
+                case "DECR" when parts.Length == 4 || parts.Length == 3:
+                    {
+                        if (parts.Length == 4)
+                        {
+                            var cluster = parts[1];
+                            var key = parts[2];
+                            var value = parts[3];
+                            if (!string.IsNullOrEmpty(value) && int.TryParse(value, out int result))
+                                await client.DECR(cluster, key, result, mainUserName, mainPassword);
+                            else
+                            {
+                                "invalid enumerator. input must be number".WriteError();
+                                "Tip => DECR [cluster] [key] [number] => DECR dev incr 2".WriteTip();
+                            }
+
+                        }
+                        else
+                        {
+                            var cluster = parts[1];
+                            var key = parts[2];
+                            await client.DECR(cluster, key, null, mainUserName, mainPassword);
+                        }
+                        break;
+                    }
                 case "set_cluster" when parts.Length == 2:
                     {
                         var cluster = parts[1];
@@ -193,6 +242,10 @@ public static class CommandHandler
     private static void PrintHelp()
     {
         "Commands:".WriteInfo();
+        "INCR [clusterName] [key] [enumerable] - for increase command".WriteInfo();
+        "TIP => value can be null in INCR".WriteTip();
+        "DECR [clusterName] [key] [enumerable] - for decrease command".WriteInfo();
+        "TIP => value can be null in DECR".WriteTip();
         "add_profile [userName] [password] to set new profile".WriteInfo();
         "logout for logout in russel".WriteInfo();
         "set [cluster name] [key] - Set value for key in cluster".WriteInfo();
