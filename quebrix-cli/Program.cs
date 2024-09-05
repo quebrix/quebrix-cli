@@ -4,6 +4,7 @@ using Russel_CLI.Settings;
 using System.Text.Json;
 using RestSharp;
 using System.Reflection;
+using System.Globalization;
 
 public class Program
 {
@@ -32,17 +33,17 @@ public class Program
         Console.WriteLine("" +
             "");
 
-        Console.WriteLine("                                     |===========================================|");
-        Console.WriteLine("                                     ||   ////////      ||//////      \\\\    //  ||");
-        Console.WriteLine("                                     ||  ||      ||     ||     ||      \\\\  //   ||");
-        Console.WriteLine("                                     ||  ||      ||     ||     //       \\\\//    ||");
-        Console.WriteLine("                                     ||  ||      ||     ||/////          \\\\     ||");
-        Console.WriteLine("                                     ||  ||      ||     ||     ||       //\\\\    ||");
-        Console.WriteLine("                                     ||  ||      ///    ||     //      //  \\\\   ||");
-        Console.WriteLine("                                     ||   ///////        ///////      //    \\\\  ||");
-        Console.WriteLine("                                     |===========================================|");
+        Console.WriteLine("                 |=====================================================================================|");
+        Console.WriteLine("                 ||   ////////    //      //   ||///////   ||//////     ||/////////   ||  \\\\    //    ||");
+        Console.WriteLine("                 ||  ||      ||   //      //   ||          ||     ||    ||       //        \\\\  //     ||");
+        Console.WriteLine("                 ||  ||      ||   //      //   ||          ||     //    ||      //    ||    \\\\//      ||");
+        Console.WriteLine("                 ||  ||      ||   //      //   ||///////   ||/////      ||///////     ||     \\\\\\      ||");
+        Console.WriteLine("                 ||  ||      ||   //      //   ||          ||     ||    ||      //    ||     //\\\\     ||");
+        Console.WriteLine("                 ||  ||      ///  //      //   ||          ||     //    ||      //    ||    //  \\\\    ||");
+        Console.WriteLine("                 ||   ///////      ////////    ||///////   ////////     ||      //    ||   //    \\\\   ||");
+        Console.WriteLine("                 |=====================================================================================|");
         Console.WriteLine("");
-        Console.WriteLine($"                                    VERSION {Assembly.GetExecutingAssembly().GetName().Version}" +
+        Console.WriteLine($"                  VERSION {Assembly.GetExecutingAssembly().GetName().Version}" +
             "");
         Console.WriteLine("======================================= FOR CHECKING CONNECTION TYPE [ping] ============================================");
 
