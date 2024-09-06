@@ -134,7 +134,7 @@ public class ApiClient
             }
             else
             {
-                "access denied login first".WriteError();
+                "key not found".WriteError();
             }
         }
         else
@@ -223,7 +223,7 @@ public class ApiClient
                 if (apiResponse.IsSuccess)
                 {
                     var result = string.Empty;
-                    if (apiResponse.Data.ValueType == "Num")
+                    if (apiResponse.Data.ValueType == "Int")
                         result = BitConverter.ToInt32(apiResponse.Data.Value).ToString();
                     else
                         result = Encoding.UTF8.GetString(apiResponse.Data.Value).DecodeBase64ToString();
