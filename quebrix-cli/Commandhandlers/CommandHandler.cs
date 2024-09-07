@@ -1,4 +1,5 @@
 ﻿using Russel_CLI.Helpers;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -77,11 +78,30 @@ public static class CommandHandler
 
             switch (parts[0])
             {
-                case "add_profile" when parts.Length == 4:
+                case "ACL" when parts.Length == 1:
                     {
-                        var user = parts[1];
-                        var password = parts[2];
-                        var role = parts[3];
+                        "invalid command".WriteError();
+                        "ACL <options> [userName ...]".WriteTip();
+                        break;
+                    }
+                case "ACL" when parts.Length == 3 && parts[1] == "DELUSER":
+                    {
+                        await client.DeleteUser(parts[2], mainUserName, mainPassword);
+                        break;
+                    }
+                case "ACL" when parts.Length == 2:
+                    {
+                        if (parts[1] == "LOAD")
+                            await client.LoadUserFromFile(mainUserName, mainPassword);
+                        else if (parts[1] == "LIST")
+                            await client.ListOfUsers(mainUserName, mainPassword);
+                        break;
+                    }
+                case "ACL" when parts.Length == 5 && parts[1] == "SETUSER":
+                    {
+                        var user = parts[2];
+                        var password = parts[3];
+                        var role = parts[4];
                         await client.AddUser(user, password, role, mainUserName, mainPassword);
                         break;
                     }
@@ -246,7 +266,6 @@ public static class CommandHandler
         "TIP => value can be null in INCR".WriteTip();
         "DECR [clusterName] [key] [enumerable] - for decrease command".WriteInfo();
         "TIP => value can be null in DECR".WriteTip();
-        "add_profile [userName] [password] to set new profile".WriteInfo();
         "logout for logout in russel".WriteInfo();
         "set [cluster name] [key] - Set value for key in cluster".WriteInfo();
         "TIP => ttl can be null in set but value can not be null or empty".WriteTip();
@@ -257,6 +276,8 @@ public static class CommandHandler
         "clear_cluster [cluster name] - Clear all keys in cluster".WriteInfo();
         "cluster* - Get list of all clusters".WriteInfo();
         "keys* [cluster name] - Get all keys in cluster".WriteInfo();
+        "ACL SETUSER [userName] [password] [role]".WriteInfo();
+        "Tip => for see the roles and their access modifier type \"Help ACL\"".WriteTip();
         "-v - Show version".WriteInfo();
         "help - Show this help message".WriteInfo();
     }

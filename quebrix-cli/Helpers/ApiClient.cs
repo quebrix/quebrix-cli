@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using quebrix.Helpers;
 using RestSharp;
 using Russel_CLI.Extensions;
@@ -141,6 +142,92 @@ public class ApiClient
         {
             $"Error setting value: {response.ErrorMessage}".WriteError();
         }
+    }
+
+
+    public async Task LoadUserFromFile(string userName, string password)
+    {
+        var url = "/api/load_users_from_file";
+        var request = new RestRequest(url, Method.Post);
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
+
+        var response = await _client.ExecuteAsync(request);
+        if (response.IsSuccessful)
+        {
+            var result = JsonConvert.DeserializeObject<ApiResponse<string>>(response.Content);
+            if (result.IsSuccess)
+            {
+                result.Data.WriteResponse();
+            }
+            else
+            {
+                "access denied login first".WriteError();
+            }
+        }
+        else
+        {
+            $"Error setting value: {response.ErrorMessage}".WriteError();
+        }
+
+    }
+
+    public async Task ListOfUsers(string userName, string password)
+    {
+        var url = "/api/load_users";
+        var request = new RestRequest(url, Method.Get);
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
+
+        var response = await _client.ExecuteAsync(request);
+        if (response.IsSuccessful)
+        {
+            var result = JsonConvert.DeserializeObject<ApiResponse<List<UserResponse>>>(response.Content);
+            if (result.IsSuccess)
+            {
+                foreach (var item in result.Data)
+                {
+                    $"{item.UserName}:{item.Role}".WriteResponse();
+                }
+
+            }
+            else
+            {
+                "access denied login first".WriteError();
+            }
+        }
+        else
+        {
+            $"Error setting value: {response.ErrorMessage}".WriteError();
+        }
+
+    }
+
+    public async Task DeleteUser(string deleteUserName, string userName, string password)
+    {
+        var url = $"/api/delete_user/{deleteUserName.EncodeUrl()}";
+        var request = new RestRequest(url, Method.Delete);
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
+
+        var response = await _client.ExecuteAsync(request);
+        if (response.IsSuccessful)
+        {
+            var result = JsonConvert.DeserializeObject<ApiResponse<string>>(response.Content);
+            if (result.IsSuccess)
+            {
+                $"{result.Data}".WriteResponse();
+            }
+            else
+            {
+                "access denied login first".WriteError();
+            }
+        }
+        else
+        {
+            $"Error setting value: {response.ErrorMessage}".WriteError();
+        }
+
     }
 
     public async Task AddUser(string userName, string password, string role, string reqUser, string reqPassword)
@@ -349,7 +436,22 @@ public class ApiClient
     }
 
 }
+
+
+
 //requests
+
+public class UserResponse
+{
+    [JsonProperty("password")]
+    public object Password { get; set; }
+
+    [JsonProperty("username")]
+    public string UserName { get; set; }
+
+    [JsonProperty("role")]
+    public string Role { get; set; }
+}
 public class ApiResponse<T>
 {
     [JsonProperty("is_success")]
