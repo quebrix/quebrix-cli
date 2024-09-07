@@ -1,15 +1,13 @@
 ﻿using Russel_CLI.Helpers;
-using Microsoft.Extensions.Configuration;
 using Russel_CLI.Settings;
 using System.Text.Json;
-using RestSharp;
 using System.Reflection;
-using System.Globalization;
 
 public class Program
 {
     public static async Task Main(string[] args)
     {
+
         try
         {
             PrintRussel();
@@ -32,7 +30,7 @@ public class Program
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("" +
             "");
-
+        
         Console.WriteLine("                 |=====================================================================================|");
         Console.WriteLine("                 ||   ////////    //      //   ||///////   ||//////     ||/////////   ||  \\\\    //    ||");
         Console.WriteLine("                 ||  ||      ||   //      //   ||          ||     ||    ||       //        \\\\  //     ||");
