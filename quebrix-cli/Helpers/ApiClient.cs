@@ -49,7 +49,7 @@ public class ApiClient
         {
             cluster = cluster,
             key = key,
-            value = Convert.ToBase64String(Encoding.UTF8.GetBytes(value)),
+            value = value,
             ttl = expireTime
         };
         var jsonBody = JsonConvert.SerializeObject(setRequest);
@@ -68,6 +68,73 @@ public class ApiClient
             else
             {
                 "access denied login first".WriteError();
+            }
+        }
+        else
+        {
+            $"Error setting value: {response.ErrorMessage}".WriteError();
+        }
+    }
+
+    public async Task MoveClusterValues(string srcCluster, string destCluster,string userName, string password)
+    {
+        var url = "/api/move_cluster_values";
+        var request = new RestRequest(url, Method.Post);
+        var setRequest = new MoveClusterRequest
+        {
+            DestCluster = destCluster,
+            SrcCluster = srcCluster
+        };
+        var jsonBody = JsonConvert.SerializeObject(setRequest);
+        request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
+
+        var response = await _client.ExecuteAsync(request);
+        if (response.IsSuccessful)
+        {
+            var result = JsonConvert.DeserializeObject<ApiResponse<string>>(response.Content);
+            if (result.IsSuccess)
+            {
+                result.Data.WriteResponse();
+            }
+            else
+            {
+                "src cluster not found".WriteError();
+            }
+        }
+        else
+        {
+            $"Error setting value: {response.ErrorMessage}".WriteError();
+        }
+    }
+
+
+    public async Task MoveAndDeleteClusterValues(string srcCluster, string destCluster, string userName, string password)
+    {
+        var url = "/api/move_delete_cluster_values";
+        var request = new RestRequest(url, Method.Post);
+        var setRequest = new MoveClusterRequest
+        {
+            DestCluster = destCluster,
+            SrcCluster = srcCluster
+        };
+        var jsonBody = JsonConvert.SerializeObject(setRequest);
+        request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
+
+        var response = await _client.ExecuteAsync(request);
+        if (response.IsSuccessful)
+        {
+            var result = JsonConvert.DeserializeObject<ApiResponse<string>>(response.Content);
+            if (result.IsSuccess)
+            {
+                result.Data.WriteResponse();
+            }
+            else
+            {
+                "src cluster not found".WriteError();
             }
         }
         else
@@ -203,6 +270,35 @@ public class ApiClient
 
     }
 
+
+    public async Task WhoAmI(string userName, string password)
+    {
+        var url = "/api/who_am_i";
+        var request = new RestRequest(url, Method.Get);
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
+
+        var response = await _client.ExecuteAsync(request);
+        if (response.IsSuccessful)
+        {
+            var result = JsonConvert.DeserializeObject<ApiResponse<UserResponse>>(response.Content);
+            if (result.IsSuccess)
+            {
+                $"userName:{result.Data.UserName} \nrole:{result.Data.Role}".WriteResponse();
+
+            }
+            else
+            {
+                "access denied login first".WriteError();
+            }
+        }
+        else
+        {
+            $"Error setting value: {response.ErrorMessage}".WriteError();
+        }
+
+    }
+
     public async Task DeleteUser(string deleteUserName, string userName, string password)
     {
         var url = $"/api/delete_user/{deleteUserName.EncodeUrl()}";
@@ -298,6 +394,7 @@ public class ApiClient
     {
         try
         {
+
             var url = $"/api/get/{cluster.EncodeUrl()}/{key.EncodeUrl()}";
             var request = new RestRequest(url, Method.Get);
             var credentials = MakeAuth(userName, password);
@@ -313,7 +410,9 @@ public class ApiClient
                     if (apiResponse.Data.ValueType == "Int")
                         result = BitConverter.ToInt32(apiResponse.Data.Value).ToString();
                     else
-                        result = Encoding.UTF8.GetString(apiResponse.Data.Value).DecodeBase64ToString();
+                    {
+                        result = Encoding.UTF8.GetString(apiResponse.Data.Value);
+                    }
                     return result;
                 }
                 else
@@ -471,6 +570,15 @@ public class SetINCR_DECRRequest
 
     [JsonProperty("value")]
     public int? value { get; set; }
+
+}
+public class MoveClusterRequest
+{
+    [JsonProperty("src_cluster")]
+    public string SrcCluster { get; set; }
+
+    [JsonProperty("desc_cluster")]
+    public string DestCluster { get; set; }
 
 }
 

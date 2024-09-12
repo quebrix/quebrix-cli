@@ -2,6 +2,7 @@
 using Russel_CLI.Settings;
 using System.Text.Json;
 using System.Reflection;
+using System.Text;
 
 public class Program
 {
@@ -10,13 +11,15 @@ public class Program
 
         try
         {
-            PrintRussel();
+            Console.InputEncoding = Encoding.Unicode;
+            Console.OutputEncoding = Encoding.Unicode;
+            PrintQuebrix();
             var configJson = await File.ReadAllTextAsync("CLI_Config.json");
             var config = JsonSerializer.Deserialize<Config>(configJson);
             var port = config.ApiSettings.Port;
             var ip = config.ApiSettings.Ip;
             var client = new ApiClient($"http://{ip}:{port}");
-            await CommandHandler.HandleCommand(client);
+            await CommandHandler.HandleCommand(client,$"{ip}:{port}");
         }
         catch (Exception ex)
         {
@@ -25,7 +28,7 @@ public class Program
       
     }
 
-    public static void PrintRussel()
+    public static void PrintQuebrix()
     {
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("" +
