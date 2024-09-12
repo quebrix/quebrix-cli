@@ -47,6 +47,12 @@ namespace Russel_CLI.Helpers
             Console.WriteLine(text);
             Console.ResetColor();
         }
+        public static void WriteDarkCyan(this string text)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine(text);
+            Console.ResetColor();
+        }
 
         public static void WriteTip(this string text)
         {

@@ -30,7 +30,7 @@ public static class CommandHandler
 
         return password;
     }
-    public static async Task HandleCommand(ApiClient client)
+    public static async Task HandleCommand(ApiClient client,string connectionString)
     {
         string mainUserName = string.Empty;
         string mainPassword = string.Empty;
@@ -68,7 +68,7 @@ public static class CommandHandler
             }
 
             // Process commands once logged in
-            PrintPrompt();
+            PrintPrompt(connectionString);
             var input = Console.ReadLine().Trim();
             var parts = input.Split(new[] { ' ' }, 5);
             if (parts.Length == 0)
@@ -93,8 +93,12 @@ public static class CommandHandler
                     {
                         if (parts[1] == "LOAD")
                             await client.LoadUserFromFile(mainUserName, mainPassword);
+                        else if (parts[1] == "WHO_AM_I")
+                            await client.WhoAmI(mainUserName, mainPassword);
                         else if (parts[1] == "LIST")
                             await client.ListOfUsers(mainUserName, mainPassword);
+                        else
+                            PrintHelp();
                         break;
                     }
                 case "ACL" when parts.Length == 5 && parts[1] == "SETUSER":
@@ -158,6 +162,20 @@ public static class CommandHandler
                             await client.INCR(cluster, key, null, mainUserName, mainPassword);
                         }
 
+                        break;
+                    }
+                case "MOVE" when parts.Length == 3:
+                    {
+                        var srcCluster = parts[1];
+                        var destCluster = parts[2];
+                        await client.MoveClusterValues(srcCluster,destCluster,mainUserName,mainPassword);
+                        break;
+                    }
+                case "MOVEDEL" when parts.Length == 3:
+                    {
+                        var srcCluster = parts[1];
+                        var destCluster = parts[2];
+                        await client.MoveAndDeleteClusterValues(srcCluster, destCluster, mainUserName, mainPassword);
                         break;
                     }
                 case "DECR" when parts.Length == 4 || parts.Length == 3:
@@ -255,19 +273,23 @@ public static class CommandHandler
 
     }
 
-    private static void PrintPrompt()
+    private static void PrintPrompt(string connectionString)
     {
-        Console.Write("> ");
+        Console.Write($"{connectionString}> ");
     }
     private static void PrintHelp()
     {
-        "Commands:".WriteInfo();
+        "SET Commands ================>".WriteDarkCyan();
+        "set [cluster name] [key] - Set value for key in cluster".WriteInfo();
         "INCR [clusterName] [key] [enumerable] - for increase command".WriteInfo();
         "TIP => value can be null in INCR".WriteTip();
         "DECR [clusterName] [key] [enumerable] - for decrease command".WriteInfo();
         "TIP => value can be null in DECR".WriteTip();
-        "logout for logout in russel".WriteInfo();
-        "set [cluster name] [key] - Set value for key in cluster".WriteInfo();
+        "logout for logout in quebrix".WriteInfo();
+        "MOVE [src clusterName] [dest clusterName] move values of cluster to destination cluster".WriteInfo();
+        "Tip => move command will override all values in destination if it exists".WriteTip();
+        "MOVEDEL [src clusterName] [dest clusterName] move values of cluster to destination cluster then delete src".WriteInfo();
+        "Tip => if you used this command src will deleted and it wont be returnable".WriteTip();
         "TIP => ttl can be null in set but value can not be null or empty".WriteTip();
         "set [cluster name] [key] [value] [ttl in millisecond] - Set value for key with time life in cluster".WriteInfo();
         "set_cluster [cluster name] - Set a new cluster".WriteInfo();
@@ -276,8 +298,12 @@ public static class CommandHandler
         "clear_cluster [cluster name] - Clear all keys in cluster".WriteInfo();
         "cluster* - Get list of all clusters".WriteInfo();
         "keys* [cluster name] - Get all keys in cluster".WriteInfo();
+        "ACL Commands ======================>".WriteDarkCyan();
+        "ACL LIST for load all valid users".WriteInfo();
+        "ACL LOAD for load all users from cred file in server".WriteInfo();
+        "ACL DELUSER [userName] for delete user from server ".WriteInfo();
         "ACL SETUSER [userName] [password] [role]".WriteInfo();
-        "Tip => for see the roles and their access modifier type \"Help ACL\"".WriteTip();
+        "TIP => by this command user also delete from file".WriteTip();
         "-v - Show version".WriteInfo();
         "help - Show this help message".WriteInfo();
     }
