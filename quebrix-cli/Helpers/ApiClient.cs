@@ -76,9 +76,9 @@ public class ApiClient
         }
     }
 
-    public async Task MoveClusterValues(string srcCluster, string destCluster,string userName, string password)
+    public async Task CopyCluster(string srcCluster, string destCluster,string userName, string password)
     {
-        var url = "/api/move_cluster_values";
+        var url = "/api/move_cluster";
         var request = new RestRequest(url, Method.Post);
         var setRequest = new MoveClusterRequest
         {
@@ -110,9 +110,9 @@ public class ApiClient
     }
 
 
-    public async Task MoveAndDeleteClusterValues(string srcCluster, string destCluster, string userName, string password)
+    public async Task MoveCluster(string srcCluster, string destCluster, string userName, string password)
     {
-        var url = "/api/move_delete_cluster_values";
+        var url = "/api/move_cluster";
         var request = new RestRequest(url, Method.Post);
         var setRequest = new MoveClusterRequest
         {

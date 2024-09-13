@@ -114,7 +114,7 @@ public static class CommandHandler
                         await client.CheckConnection();
                         break;
                     }
-                case "set" when parts.Length == 3:
+                case "SET" when parts.Length == 3:
                     {
                         var cluster = parts[1];
                         var key = parts[2];
@@ -164,18 +164,18 @@ public static class CommandHandler
 
                         break;
                     }
+                case "COPY" when parts.Length == 3:
+                    {
+                        var srcCluster = parts[1];
+                        var destCluster = parts[2];
+                        await client.CopyCluster(srcCluster,destCluster,mainUserName,mainPassword);
+                        break;
+                    }
                 case "MOVE" when parts.Length == 3:
                     {
                         var srcCluster = parts[1];
                         var destCluster = parts[2];
-                        await client.MoveClusterValues(srcCluster,destCluster,mainUserName,mainPassword);
-                        break;
-                    }
-                case "MOVEDEL" when parts.Length == 3:
-                    {
-                        var srcCluster = parts[1];
-                        var destCluster = parts[2];
-                        await client.MoveAndDeleteClusterValues(srcCluster, destCluster, mainUserName, mainPassword);
+                        await client.MoveCluster(srcCluster, destCluster, mainUserName, mainPassword);
                         break;
                     }
                 case "DECR" when parts.Length == 4 || parts.Length == 3:
@@ -202,7 +202,7 @@ public static class CommandHandler
                         }
                         break;
                     }
-                case "set_cluster" when parts.Length == 2:
+                case "SET_CLUSTER" when parts.Length == 2:
                     {
                         var cluster = parts[1];
                         await client.SetCluster(cluster, mainUserName, mainPassword);
@@ -215,7 +215,7 @@ public static class CommandHandler
                         $"Keys in cluster [{cluster}]: {string.Join(", ", keys)}".WriteResponse();
                         break;
                     }
-                case "get" when parts.Length == 3:
+                case "GET" when parts.Length == 3:
                     {
                         var cluster = parts[1];
                         var key = parts[2];
@@ -226,14 +226,14 @@ public static class CommandHandler
                             $"{value}".WriteResponse();
                         break;
                     }
-                case "delete" when parts.Length == 3:
+                case "DELETE" when parts.Length == 3:
                     {
                         var cluster = parts[1];
                         var key = parts[2];
                         await client.Delete(cluster, key, mainUserName, mainPassword);
                         break;
                     }
-                case "clear_cluster" when parts.Length == 2:
+                case "CLEAR_CLUSTER" when parts.Length == 2:
                     {
                         var cluster = parts[1];
                         await client.ClearCluster(cluster, mainUserName, mainPassword);
@@ -255,7 +255,7 @@ public static class CommandHandler
                         PrintHelp();
                         break;
                     }
-                case "logout":
+                case "LOGOUT":
                     {
                         isLoggedIn = false;
                         mainUserName = string.Empty;
@@ -280,22 +280,21 @@ public static class CommandHandler
     private static void PrintHelp()
     {
         "SET Commands ================>".WriteDarkCyan();
-        "set [cluster name] [key] - Set value for key in cluster".WriteInfo();
+        "SET [cluster name] [key] - Set value for key in cluster".WriteInfo();
+        "TIP => ttl can be null in set but value can not be null or empty".WriteTip();
         "INCR [clusterName] [key] [enumerable] - for increase command".WriteInfo();
         "TIP => value can be null in INCR".WriteTip();
         "DECR [clusterName] [key] [enumerable] - for decrease command".WriteInfo();
         "TIP => value can be null in DECR".WriteTip();
-        "logout for logout in quebrix".WriteInfo();
-        "MOVE [src clusterName] [dest clusterName] move values of cluster to destination cluster".WriteInfo();
-        "Tip => move command will override all values in destination if it exists".WriteTip();
-        "MOVEDEL [src clusterName] [dest clusterName] move values of cluster to destination cluster then delete src".WriteInfo();
+        "LOGOUT for logout in quebrix".WriteInfo();
+        "COPY [src clusterName] [dest clusterName] move values of cluster to destination cluster".WriteInfo();
+        "Tip => copy command will override all values in destination if it exists".WriteTip();
+        "MOVE [src clusterName] [dest clusterName] move values of cluster to destination cluster then delete src".WriteInfo();
         "Tip => if you used this command src will deleted and it wont be returnable".WriteTip();
-        "TIP => ttl can be null in set but value can not be null or empty".WriteTip();
-        "set [cluster name] [key] [value] [ttl in millisecond] - Set value for key with time life in cluster".WriteInfo();
-        "set_cluster [cluster name] - Set a new cluster".WriteInfo();
-        "get [cluster name] [key] - Get value for key in cluster".WriteInfo();
-        "delete [cluster name] [key] - Delete key from cluster".WriteInfo();
-        "clear_cluster [cluster name] - Clear all keys in cluster".WriteInfo();
+        "SET_CLUSTER [cluster name] - Set a new cluster".WriteInfo();
+        "GET [cluster name] [key] - Get value for key in cluster".WriteInfo();
+        "DELETE [cluster name] [key] - Delete key from cluster".WriteInfo();
+        "CLEAR_CLUSTER [cluster name] - Clear all keys in cluster".WriteInfo();
         "cluster* - Get list of all clusters".WriteInfo();
         "keys* [cluster name] - Get all keys in cluster".WriteInfo();
         "ACL Commands ======================>".WriteDarkCyan();
