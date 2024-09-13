@@ -1,4 +1,5 @@
-﻿using Russel_CLI.Helpers;
+﻿using Newtonsoft.Json.Linq;
+using Russel_CLI.Helpers;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Reflection;
@@ -215,6 +216,34 @@ public static class CommandHandler
                         $"Keys in cluster [{cluster}]: {string.Join(", ", keys)}".WriteResponse();
                         break;
                     }
+                case "TYPE" when parts.Length == 3:
+                    {
+                        var cluster = parts[1];
+                        var key = parts[2];
+                        await client.TypeOfKey(cluster,key,mainUserName,mainPassword);
+                        break;
+                    }
+                case "EXISTS" when parts.Length == 3:
+                    {
+                        var cluster = parts[1];
+                        var key = parts[2];
+                        await client.Exists(cluster, key, mainUserName, mainPassword);
+                        break;
+                    }
+                case "EXPIRE" when parts.Length == 4:
+                    {
+                        var cluster = parts[1];
+                        var key = parts[2];
+                        var ttl = parts[3];
+                        if (!string.IsNullOrEmpty(ttl) && int.TryParse(ttl, out int result))
+                            await client.Expire(cluster, key, result, mainUserName, mainPassword);
+                        else
+                        {
+                            "invalid enumerator. input must be number".WriteError();
+                            "Tip => EXPIRE [cluster] [key] [number] => EXPIRE dev test 2000".WriteTip();
+                        }
+                        break;
+                    }
                 case "GET" when parts.Length == 3:
                     {
                         var cluster = parts[1];
@@ -280,8 +309,11 @@ public static class CommandHandler
     private static void PrintHelp()
     {
         "SET Commands ================>".WriteDarkCyan();
-        "SET [cluster name] [key] - Set value for key in cluster".WriteInfo();
+        "SET [clusterName] [key] - Set value for key in cluster".WriteInfo();
         "TIP => ttl can be null in set but value can not be null or empty".WriteTip();
+        "EXISTS [clusterName] [key] - check key exists in cluster or not".WriteInfo();
+        "EXPIRE [clusterName] [key] [ttl] - for set expiretion of key".WriteInfo();
+        "TYPE [clusterName] [key] - for get type of value".WriteInfo();
         "INCR [clusterName] [key] [enumerable] - for increase command".WriteInfo();
         "TIP => value can be null in INCR".WriteTip();
         "DECR [clusterName] [key] [enumerable] - for decrease command".WriteInfo();
@@ -291,12 +323,12 @@ public static class CommandHandler
         "Tip => copy command will override all values in destination if it exists".WriteTip();
         "MOVE [src clusterName] [dest clusterName] move values of cluster to destination cluster then delete src".WriteInfo();
         "Tip => if you used this command src will deleted and it wont be returnable".WriteTip();
-        "SET_CLUSTER [cluster name] - Set a new cluster".WriteInfo();
-        "GET [cluster name] [key] - Get value for key in cluster".WriteInfo();
-        "DELETE [cluster name] [key] - Delete key from cluster".WriteInfo();
-        "CLEAR_CLUSTER [cluster name] - Clear all keys in cluster".WriteInfo();
+        "SET_CLUSTER [clusterName] - Set a new cluster".WriteInfo();
+        "GET [clusterName] [key] - Get value for key in cluster".WriteInfo();
+        "DELETE [clusterName] [key] - Delete key from cluster".WriteInfo();
+        "CLEAR_CLUSTER [clusterName] - Clear all keys in cluster".WriteInfo();
         "cluster* - Get list of all clusters".WriteInfo();
-        "keys* [cluster name] - Get all keys in cluster".WriteInfo();
+        "keys* [clusterName] - Get all keys in cluster".WriteInfo();
         "ACL Commands ======================>".WriteDarkCyan();
         "ACL LIST for load all valid users".WriteInfo();
         "ACL LOAD for load all users from cred file in server".WriteInfo();

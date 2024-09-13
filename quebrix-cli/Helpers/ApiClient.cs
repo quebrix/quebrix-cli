@@ -78,7 +78,7 @@ public class ApiClient
 
     public async Task CopyCluster(string srcCluster, string destCluster,string userName, string password)
     {
-        var url = "/api/move_cluster";
+        var url = "/api/copy_cluster";
         var request = new RestRequest(url, Method.Post);
         var setRequest = new MoveClusterRequest
         {
@@ -101,6 +101,106 @@ public class ApiClient
             else
             {
                 "src cluster not found".WriteError();
+            }
+        }
+        else
+        {
+            $"Error setting value: {response.ErrorMessage}".WriteError();
+        }
+    }
+
+    public async Task TypeOfKey(string cluster, string key, string userName, string password)
+    {
+        var url = "/api/typeof";
+        var request = new RestRequest(url, Method.Post);
+        var setRequest = new TypeOfKeyRequest
+        {
+            Cluster = cluster,
+            key = key
+        };
+        var jsonBody = JsonConvert.SerializeObject(setRequest);
+        request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
+
+        var response = await _client.ExecuteAsync(request);
+        if (response.IsSuccessful)
+        {
+            var result = JsonConvert.DeserializeObject<ApiResponse<string>>(response.Content);
+            if (result.IsSuccess)
+            {
+                result.Data.WriteResponse();
+            }
+            else
+            {
+                result.Data.WriteError();
+            }
+        }
+        else
+        {
+            $"Error setting value: {response.ErrorMessage}".WriteError();
+        }
+    }
+
+    public async Task Exists(string cluster, string key, string userName, string password)
+    {
+        var url = "/api/exists";
+        var request = new RestRequest(url, Method.Post);
+        var setRequest = new TypeOfKeyRequest
+        {
+            Cluster = cluster,
+            key = key
+        };
+        var jsonBody = JsonConvert.SerializeObject(setRequest);
+        request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
+
+        var response = await _client.ExecuteAsync(request);
+        if (response.IsSuccessful)
+        {
+            var result = JsonConvert.DeserializeObject<ApiResponse<string>>(response.Content);
+            if (result.IsSuccess)
+            {
+                result.Data.WriteResponse();
+            }
+            else
+            {
+                result.Data.WriteError();
+            }
+        }
+        else
+        {
+            $"Error setting value: {response.ErrorMessage}".WriteError();
+        }
+    }
+
+    public async Task Expire(string cluster, string key,long ttl, string userName, string password)
+    {
+        var url = "/api/expire";
+        var request = new RestRequest(url, Method.Post);
+        var setRequest = new ExpireKeyRequest
+        {
+            Cluster = cluster,
+            key = key,
+            ttl = ttl
+        };
+        var jsonBody = JsonConvert.SerializeObject(setRequest);
+        request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
+
+        var response = await _client.ExecuteAsync(request);
+        if (response.IsSuccessful)
+        {
+            var result = JsonConvert.DeserializeObject<ApiResponse<string>>(response.Content);
+            if (result.IsSuccess)
+            {
+                result.Data.ToString().WriteResponse();
+            }
+            else
+            {
+                result.Data.ToString().WriteError();
             }
         }
         else
@@ -579,6 +679,29 @@ public class MoveClusterRequest
 
     [JsonProperty("desc_cluster")]
     public string DestCluster { get; set; }
+
+}
+
+
+public class TypeOfKeyRequest
+{
+    [JsonProperty("cluster")]
+    public string Cluster { get; set; }
+
+    [JsonProperty("key")]
+    public string key { get; set; }
+
+}
+
+public class ExpireKeyRequest
+{
+    [JsonProperty("cluster")]
+    public string Cluster { get; set; }
+
+    [JsonProperty("key")]
+    public string key { get; set; }
+    [JsonProperty("ttl")]
+    public long ttl { get; set; }
 
 }
 
