@@ -300,7 +300,8 @@ public static class CommandHandler
                     }
                 case "cls":
                     {
-
+                        Console.Clear();
+                        PrintQuebrix();
                         break;
                     }
                 default:
@@ -316,6 +317,26 @@ public static class CommandHandler
     private static void PrintPrompt(string connectionString)
     {
         Console.Write($"{connectionString}> ");
+    }
+    private static void PrintQuebrix()
+    {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("" +
+            "");
+
+        Console.WriteLine("                 |=====================================================================================|");
+        Console.WriteLine("                 ||   ////////    //      //   ||///////   ||//////     ||/////////   ||  \\\\    //    ||");
+        Console.WriteLine("                 ||  ||      ||   //      //   ||          ||     ||    ||       //        \\\\  //     ||");
+        Console.WriteLine("                 ||  ||      ||   //      //   ||          ||     //    ||      //    ||    \\\\//      ||");
+        Console.WriteLine("                 ||  ||      ||   //      //   ||///////   ||/////      ||///////     ||     \\\\\\      ||");
+        Console.WriteLine("                 ||  ||      ||   //      //   ||          ||     ||    ||      //    ||     //\\\\     ||");
+        Console.WriteLine("                 ||  ||      ///  //      //   ||          ||     //    ||      //    ||    //  \\\\    ||");
+        Console.WriteLine("                 ||   ///////      ////////    ||///////   ////////     ||      //    ||   //    \\\\   ||");
+        Console.WriteLine("                 |=====================================================================================|");
+        Console.WriteLine("");
+        Console.WriteLine($"                  VERSION {Assembly.GetExecutingAssembly().GetName().Version}" +
+            "");
+        Console.ResetColor();
     }
     private static void PrintHelp()
     {
@@ -342,6 +363,7 @@ public static class CommandHandler
         "cluster* - Get list of all clusters".WriteInfo();
         "keys* [clusterName] - Get all keys in cluster".WriteInfo();
         "ACL Commands ======================>".WriteDarkCyan();
+        "ACL WHO_AM_I - for show current user role".WriteInfo();
         "ACL LIST for load all valid users".WriteInfo();
         "ACL LOAD for load all users from cred file in server".WriteInfo();
         "ACL DELUSER [userName] for delete user from server ".WriteInfo();
