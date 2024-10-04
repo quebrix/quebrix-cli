@@ -31,7 +31,7 @@ public static class CommandHandler
 
         return password;
     }
-    public static async Task HandleCommand(ApiClient client,string connectionString)
+    public static async Task HandleCommand(ApiClient client, string connectionString)
     {
         string mainUserName = string.Empty;
         string mainPassword = string.Empty;
@@ -169,7 +169,7 @@ public static class CommandHandler
                     {
                         var srcCluster = parts[1];
                         var destCluster = parts[2];
-                        await client.CopyCluster(srcCluster,destCluster,mainUserName,mainPassword);
+                        await client.CopyCluster(srcCluster, destCluster, mainUserName, mainPassword);
                         break;
                     }
                 case "MOVE" when parts.Length == 3:
@@ -220,7 +220,7 @@ public static class CommandHandler
                     {
                         var cluster = parts[1];
                         var key = parts[2];
-                        await client.TypeOfKey(cluster,key,mainUserName,mainPassword);
+                        await client.TypeOfKey(cluster, key, mainUserName, mainPassword);
                         break;
                     }
                 case "EXISTS" when parts.Length == 3:
@@ -228,6 +228,12 @@ public static class CommandHandler
                         var cluster = parts[1];
                         var key = parts[2];
                         await client.Exists(cluster, key, mainUserName, mainPassword);
+                        break;
+                    }
+                case "COUNT" when parts.Length == 2:
+                    {
+                        var cluster = parts[1];
+                        await client.KeysCount(cluster, mainUserName, mainPassword);
                         break;
                     }
                 case "EXPIRE" when parts.Length == 4:
@@ -292,6 +298,12 @@ public static class CommandHandler
                         "Logged out successfully.".WriteGreen();
                         break;
                     }
+                case "cls":
+                    {
+                        Console.Clear();
+                        PrintQuebrix();
+                        break;
+                    }
                 default:
                     {
                         "Invalid command. Use 'help' to see available commands.".WriteInfo();
@@ -306,11 +318,32 @@ public static class CommandHandler
     {
         Console.Write($"{connectionString}> ");
     }
+    private static void PrintQuebrix()
+    {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("" +
+            "");
+
+        Console.WriteLine("                 |=====================================================================================|");
+        Console.WriteLine("                 ||   ////////    //      //   ||///////   ||//////     ||/////////   ||  \\\\    //    ||");
+        Console.WriteLine("                 ||  ||      ||   //      //   ||          ||     ||    ||       //        \\\\  //     ||");
+        Console.WriteLine("                 ||  ||      ||   //      //   ||          ||     //    ||      //    ||    \\\\//      ||");
+        Console.WriteLine("                 ||  ||      ||   //      //   ||///////   ||/////      ||///////     ||     \\\\\\      ||");
+        Console.WriteLine("                 ||  ||      ||   //      //   ||          ||     ||    ||      //    ||     //\\\\     ||");
+        Console.WriteLine("                 ||  ||      ///  //      //   ||          ||     //    ||      //    ||    //  \\\\    ||");
+        Console.WriteLine("                 ||   ///////      ////////    ||///////   ////////     ||      //    ||   //    \\\\   ||");
+        Console.WriteLine("                 |=====================================================================================|");
+        Console.WriteLine("");
+        Console.WriteLine($"                  VERSION {Assembly.GetExecutingAssembly().GetName().Version}" +
+            "");
+        Console.ResetColor();
+    }
     private static void PrintHelp()
     {
         "SET Commands ================>".WriteDarkCyan();
         "SET [clusterName] [key] - Set value for key in cluster".WriteInfo();
         "TIP => ttl can be null in set but value can not be null or empty".WriteTip();
+        "COUNT [clusterName] - for get key count of cluster".WriteInfo();
         "EXISTS [clusterName] [key] - check key exists in cluster or not".WriteInfo();
         "EXPIRE [clusterName] [key] [ttl] - for set expiretion of key".WriteInfo();
         "TYPE [clusterName] [key] - for get type of value".WriteInfo();
@@ -330,6 +363,7 @@ public static class CommandHandler
         "cluster* - Get list of all clusters".WriteInfo();
         "keys* [clusterName] - Get all keys in cluster".WriteInfo();
         "ACL Commands ======================>".WriteDarkCyan();
+        "ACL WHO_AM_I - for show current user role".WriteInfo();
         "ACL LIST for load all valid users".WriteInfo();
         "ACL LOAD for load all users from cred file in server".WriteInfo();
         "ACL DELUSER [userName] for delete user from server ".WriteInfo();
