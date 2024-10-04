@@ -175,6 +175,41 @@ public class ApiClient
         }
     }
 
+    public async Task KeysCount(string cluster, string userName, string password)
+    {
+        var url = "/api/keys_count";
+        var request = new RestRequest(url, Method.Post);
+        var setRequest = new KeysCountRequest
+        {
+            Cluster = cluster,
+        };
+        var jsonBody = JsonConvert.SerializeObject(setRequest);
+        request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+        var credentials = MakeAuth(userName, password);
+        request.AddHeader("Authorization", $"{credentials}");
+
+        var response = await _client.ExecuteAsync(request);
+        if (response.IsSuccessful)
+        {
+            var result = JsonConvert.DeserializeObject<ApiResponse<long>>(response.Content);
+            if (result.IsSuccess)
+            {
+                if (result.Data == -1)
+                    "cluster not found".WriteError();
+                else
+                    result.Data.ToString().WriteResponse();
+            }
+            else
+            {
+                "cluster not found".WriteError();
+            }
+        }
+        else
+        {
+            $"Error getting value: {response.ErrorMessage}".WriteError();
+        }
+    }
+
     public async Task Expire(string cluster, string key,long ttl, string userName, string password)
     {
         var url = "/api/expire";
@@ -208,8 +243,6 @@ public class ApiClient
             $"Error setting value: {response.ErrorMessage}".WriteError();
         }
     }
-
-
     public async Task MoveCluster(string srcCluster, string destCluster, string userName, string password)
     {
         var url = "/api/move_cluster";
@@ -242,7 +275,6 @@ public class ApiClient
             $"Error setting value: {response.ErrorMessage}".WriteError();
         }
     }
-
     public async Task INCR(string cluster, string key, int? value, string userName, string password)
     {
         var url = "/api/incr";
@@ -276,7 +308,6 @@ public class ApiClient
             $"Error setting value: {response.ErrorMessage}".WriteError();
         }
     }
-
     public async Task DECR(string cluster, string key, int? value, string userName, string password)
     {
         var url = "/api/decr";
@@ -690,6 +721,13 @@ public class TypeOfKeyRequest
 
     [JsonProperty("key")]
     public string key { get; set; }
+
+}
+
+public class KeysCountRequest
+{
+    [JsonProperty("cluster")]
+    public string Cluster { get; set; }
 
 }
 
