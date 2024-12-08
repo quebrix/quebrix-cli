@@ -60,6 +60,7 @@ public class ApiClient
         var response = await _client.ExecuteAsync(request);
         if (response.IsSuccessful)
         {
+
             var result = JsonConvert.DeserializeObject<ApiResponse<string>>(response.Content);
             if (result.IsSuccess)
             {
